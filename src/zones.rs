@@ -76,7 +76,7 @@ pub enum ZoneKind {
 /// PatchZones used to create zones with PATCH method.
 #[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
 pub struct PatchZone {
-    pub rrsets: Vec<RRSet>
+    pub rrsets: Vec<RRSet>,
 }
 
 // impl ZoneKind {
@@ -173,6 +173,26 @@ impl<'a> ZoneClient<'a> {
         }
     }
 
+    /// Create a new zone.
+    /// See: https://doc.powerdns.com/authoritative/http-api/zone.html#creating-new-zone
+    pub async fn create(&self, zone: Zone) -> Result<Zone, Error> {
+        let resp: Zone = self
+            .api_client
+            .http_client
+            .post(
+            format!(
+                "{}/api/v1/servers/{}/zones/",
+                self.api_client.base_url,self.api_client.server_name,
+            ))
+            .json(&zone)
+            .send()
+            .await?
+            .json()
+            .await?;
+
+        Ok(resp)
+    }
+
     /// Get a zone managed by a server
     pub async fn get(&self, zone_id: &str) -> Result<Zone, Error> {
         let zone_id = canonicalize_domain(zone_id).unwrap();
@@ -240,7 +260,7 @@ impl<'a> ZoneClient<'a> {
             StatusCode::BAD_REQUEST | StatusCode::NOT_FOUND |
             StatusCode::UNPROCESSABLE_ENTITY | StatusCode::INTERNAL_SERVER_ERROR => {
                 Err(Error::PowerDNS(response.json().await?))
-            },
+            }
             status @ _ => Err(Error::UnexpectedStatusCode(status)),
         }
     }
