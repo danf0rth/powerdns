@@ -7,7 +7,7 @@ use crate::Error;
 use crate::error::PowerDNSResponseError;
 
 /// A Zone object represents an authoritative DNS Zone.
-#[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
+#[derive(Debug, Clone, PartialEq, Deserialize, Serialize, Default)]
 #[serde_with::skip_serializing_none]
 pub struct Zone {
     /// Opaque zone id (string), assigned by the server, should not be
