@@ -181,7 +181,7 @@ impl<'a> ZoneClient<'a> {
             .http_client
             .post(
             format!(
-                "{}/api/v1/servers/{}/zones/",
+                "{}/api/v1/servers/{}/zones",
                 self.api_client.base_url,self.api_client.server_name,
             ))
             .json(&zone)
