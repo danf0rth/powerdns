@@ -176,7 +176,7 @@ impl<'a> ZoneClient<'a> {
     /// Create a new zone.
     /// See: https://doc.powerdns.com/authoritative/http-api/zone.html#creating-new-zone
     pub async fn create(&self, zone: Zone) -> Result<Zone, Error> {
-        let resp: Zone = self
+        let resp = self
             .api_client
             .http_client
             .post(
@@ -186,11 +186,13 @@ impl<'a> ZoneClient<'a> {
             ))
             .json(&zone)
             .send()
-            .await?
-            .json()
             .await?;
 
-        Ok(resp)
+            if resp.status().is_success() {
+                return Ok(resp.json().await?)
+            } else {
+                Err(resp.json::<PowerDNSResponseError>().await?)?
+            }
     }
 
     /// Get a zone managed by a server
@@ -225,8 +227,7 @@ impl<'a> ZoneClient<'a> {
                 self.api_client.base_url, self.api_client.server_name
             ))
             .send()
-            .await
-            .unwrap();
+            .await?;
 
         if resp.status().is_success() {
             Ok(())
