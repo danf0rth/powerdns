@@ -1,4 +1,4 @@
-use std::fmt::{Debug, Display, Formatter, Write};
+use std::fmt::{Debug, Display, Formatter};
 use reqwest::StatusCode;
 use serde::Deserialize;
 use thiserror::Error;
@@ -11,10 +11,10 @@ pub enum Error {
     #[error("powerdns returned error in response: {0:?}")]
     PowerDNS(#[from] PowerDNSResponseError),
 
-    #[error("error while performing request: {}", 0)]
+    #[error("error while performing request: {0}")]
     RequestError(#[from] reqwest::Error),
 
-    #[error("received unexpected status code: {}", 0)]
+    #[error("received unexpected status code: {0}")]
     UnexpectedStatusCode(StatusCode),
 
     #[error("deserialization error: {0}")]
